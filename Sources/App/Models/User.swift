@@ -6,11 +6,18 @@ final class User: SQLiteModel {
     var id: Int?
     var email: String
     var password: String
+    var isAdmin: Bool?
 
-    init(id: Int? = nil, email: String, password: String) {
+    init(
+        id: Int? = nil,
+        email: String,
+        password: String,
+        isAdmin: Bool? = false
+    ) {
         self.id = id
         self.email = email
         self.password = password
+        self.isAdmin = isAdmin
     }
 }
 
@@ -27,3 +34,11 @@ extension User: PasswordAuthenticatable {
 }
 
 extension User: SessionAuthenticatable {}
+
+extension User {
+    struct AdminRegister: Content {
+        var email: String
+        var password: String
+        var isAdmin: String
+    }
+}

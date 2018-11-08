@@ -58,4 +58,37 @@ final class UserController {
         try req.unauthenticateSession(User.self)
         return Future.map(on: req) { return req.redirect(to: "/login") }
     }
+
+    /// MARK: Admin
+
+    func renderAdminRegister(_ req: Request) throws -> Future<View> {
+        return try req.view().render("admin-register")
+    }
+
+    func adminRegister(_ req: Request) throws -> Future<Response> {
+        return try req.content.decode(User.self).flatMap { user in
+
+            return User.query(on: req).filter(\User.email == user.email).first().flatMap { result in
+                // if there's a user with that mail redirect to register view
+                if let _ = result {
+                    return Future.map(on: req) {
+                        return req.redirect(to: "/admin-register")
+                    }
+                }
+
+                user.password = try BCryptDigest().hash(user.password)
+                user.isAdmin = true
+
+                return user.save(on: req).map { _ in
+                    return req.redirect(to: "/login")
+                }
+            }
+        }
+    }
+
+    func userList(_ req: Request) throws -> Future<View> {
+        return User.query(on: req).all().flatMap { userList in
+            return try req.view().render("user-list", ["userlist": userList])
+        }
+    }
 }

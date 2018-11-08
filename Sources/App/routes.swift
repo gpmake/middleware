@@ -15,4 +15,11 @@ public func routes(_ router: Router) throws {
     protectedRouter.get("profile", use: userController.renderProfile)
 
     router.get("logout", use: userController.logout)
+
+    /// Admin
+    router.get("admin-register", use: userController.renderAdminRegister)
+    router.post("admin-register", use: userController.adminRegister)
+
+    let adminRouter = protectedRouter.grouped(AdminMiddleware())
+    adminRouter.get("users", use: userController.userList)
 }
